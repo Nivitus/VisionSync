@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Upload an image for object detection</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <label for="image-upload" class="file-upload-label">Choose an image</label>
+        <input id="image-upload" type="file" name="image" accept="image/*" required>
+        <div id="file-name-display"></div>
+        <button type="submit">Upload and Detect</button>
+    </form>
+    <div id="results" style="display: none;">
+        <h2>Results:</h2>
+        <div id="detections"></div>
+        <h3>Processed Image:</h3>
+        <img id="output-image" src="" alt="Processed Image">
+        <h3>JSON Results:</h3>
+        <pre id="json-results"></pre>
+    </div>
+
+    <script>
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+            document.getElementById('file-name-display').textContent = fileName;
+        });
+
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();            
+            document.getElementById('detections').innerHTML = JSON.stringify(data.detections, null, 2);
+            document.getElementById('output-image').src = `/outputs/${data.output_image}`;
+            document.getElementById('json-results').innerHTML = `<a href="/outputs/${data.output_json}" target="_blank">View JSON Results</a>`;
+            document.getElementById('results').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+version: '3'
+services:
+  vision:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "5000:5000"  # AI backend port
+      - "5001:5001"  # UI backend port
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    environment:
+      - FLASK_ENV=development  
+    networks:
+      - app_network
+    restart: unless-stopped
+
+networks:
+  app_network:
+    driver: bridge
